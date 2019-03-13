@@ -1,0 +1,22 @@
+<!--
+ Copyright (c) 2014, 2019, Oracle and/or its affiliates.
+ The Universal Permissive License (UPL), Version 1.0
+ -->
+<div class="oj-hybrid-padding">
+    
+    <h1>Simple app to get population of each country</h1>
+    </br>
+    
+    <oj-table id='table' aria-label='Departments Table'
+                                        data='[[datasource]]'
+                                        columns-defualt.sortable='disable'
+                                        columns='[ 
+                                                    {"headerText": "ID", "field": "id" },
+                                                    {"headerText": "Job title", "field": "jobtitle" },
+                                                    {"headerText": "Max salary", "field": "maxsalary" },
+                                                    {"headerText": "Min salary", "field": "minsalary" }]'
+                                        style='width: 100%; height: 100%;'>
+      </oj-table>
+
+  
+</div>
