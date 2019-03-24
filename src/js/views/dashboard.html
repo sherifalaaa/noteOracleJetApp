@@ -6,17 +6,138 @@
     
     <h1>Simple app to get population of each country</h1>
     </br>
+    </br>
+     
     
-    <oj-table id='table' aria-label='Departments Table'
-                                        data='[[datasource]]'
-                                        columns-defualt.sortable='disable'
-                                        columns='[ 
-                                                    {"headerText": "ID", "field": "id" },
-                                                    {"headerText": "Job title", "field": "jobtitle" },
-                                                    {"headerText": "Max salary", "field": "maxsalary" },
-                                                    {"headerText": "Min salary", "field": "minsalary" }]'
-                                        style='width: 100%; height: 100%;'>
-      </oj-table>
+    <div class="oj-sm-padding-4x-bottom oj-flex oj-sm-flex-items-initial oj-flex-items-pad">
+        <div class="oj-flex-item oj-sm-padding-4x-bottom">
+            <oj-label-value> 
+                <oj-label slot="label" for="myit">ID</oj-label>
+                <oj-input-text id="myit0" slot="value" value="{{id}}"></oj-input-text>
+            </oj-label-value>
 
+        </div>
+        <div class="oj-flex-item oj-sm-padding-4x-bottom">
+            <oj-label-value> 
+                <oj-label slot="label" for="myit">Job Title</oj-label>
+                <oj-input-text id="myit1" slot="value" value="{{title}}"></oj-input-text>
+            </oj-label-value>
+        </div>
+
+        <div class="oj-flex-item oj-sm-padding-4x-bottom">
+            <oj-label-value> 
+                <oj-label slot="label" for="myit">Max Salary</oj-label>
+                <oj-input-text id="myit2" slot="value" value="{{max}}"></oj-input-text>
+            </oj-label-value>
+        </div>
+
+        <div class="oj-flex-item oj-sm-padding-4x-bottom">
+            <oj-label for="text-input">Min Salary</oj-label>
+            <oj-input-text id="text-input" value="{{min}}"></oj-input-text>
+        </div>
+
+
+        <div class="oj-flex-item oj-sm-padding-4x-bottom">
+            <oj-button id='button1' class='oj-button-primary'  style='padding-top: 20px;'
+                       on-oj-action='[[buttonClick]]'>Add Employee</oj-button>
+        </div>
+        
+    </div>
+    
+    <div  id="mainContent">
+    
+    <oj-table id='table' aria-label='Departments Table' as='cell'
+                                        data='[[datasource]]'
+                                        columns-defualt.sortable='enable'
+                                        on-oj-before-current-row="[[tableSelectionListener]]"
+                                        selection-mode='{"row": "multiple", "column": "multiple"}' 
+                                        columns-default='{"template": "cellTemplate","headerTemplate": "headerTemplate"}'
+                                        columns='{{columnArray}}'
+                                       
+                                                    style='width: 100%; height: 100%; '>
+           
+        <template slot="cellTemplate">
+                <oj-bind-text value="[[cell.data]]"></oj-bind-text>
+            </template>
+        
+        <template slot="headerTemplate" data-oj-as="header">
+                <oj-bind-text value="[[header.data]]"></oj-bind-text>
+        </template>
+        
+        <template slot="checkTemplate">
+            <oj-checkboxset value='[[handleCheckbox(cell.index)]]'
+                            on-value-changed='[[checkboxListener]]'
+                            class='oj-checkboxset-no-chrome oj-selection-checkbox'
+                            id="[['table_checkboxset' + cell.index]]"
+                            selection-mode='{"row": "none", "column": "none"}' 
+                            data-row-id="{{cell.index}}"
+                            data-row-key="{{cell.row.id}}">
+                 <oj-option  value="checked"></oj-option>
+            </oj-checkboxset>   
+            </template>
+      </oj-table>
+        
+    <div id="dialogWrapper">
+        <oj-dialog id="modalDialog1" style="display:none" id="modalDialog1" dialog-title="Modal Dialog">
+            <div slot="header" class="oj-helper-clearfix" aria-labelledby="dialog-title-id">
+                <div>
+                <span id="infoIcon" class="oj-fwk-icon oj-fwk-icon-status-info" style="float:left; margin-right: 10px"></span>
+                <span id="dialog-title-id" class="oj-dialog-title">Change Employee Info</span>
+              </div>
+            </div>
+            
+            <div slot="body">
+               <div class="oj-md-odd-cols-4">
+                <oj-label for="newName" class="oj-label">Employee Department</oj-label>
+                <oj-input-text id="employeeDepartment" value="{{currentEmpDept}}"></oj-input-text>
+                <oj-label for="newName" class="oj-label">Min Salary</oj-label>
+                <oj-input-text id="minSalary" value="{{currentMinSal}}"></oj-input-text>
+                <oj-label for="newName" class="oj-label">Max Salary</oj-label>
+                <oj-input-text id="maxSalary" value="{{currentMaxSal}}"></oj-input-text>
+              </div>
+            </div>
+            <div slot="footer">
+               <oj-button id="submitBtn" on-oj-action="[[updateDeptName]]">Change</oj-button>
+               <oj-button id="submitBtn" on-oj-action="[[deleteDeptName]]">Delete</oj-button>
+               <oj-button id="resetBtn" on-oj-action="[[cancelDialog]]">Cancel</oj-button>
+            </div>
+        </oj-dialog>
+
+       
+    </div>
+        
+      <script type="text/html" id="row_tmpl">
+            <tr>
+                <td>
+                  <oj-checkboxset aria-hidden='true' on-value-changed="[[$parent.enableDelete]]" class='oj-checkboxset-no-chrome'>
+                    <oj-option id="[[id]]" value="[[remove]]"></oj-option>
+                  </oj-checkboxset>
+                </td>
+                <td>
+                  <div id='deptId' on-click="[[function(data, event){$root.showChangeNameDialog(id,data,event)}]]">
+                    <oj-bind-text value="[[id]]"></oj-bind-text>
+                  </div>
+                </td>
+                <td>
+                  <div id="deptName" on-click="[[function(data, event){$root.showChangeNameDialog(jobtitle,data,event)}]]">
+                    <oj-bind-text value="[[jobtitle]]"></oj-bind-text>
+                  </div>
+                </td>
+                <td>
+                  <div id="deptName" on-click="[[function(data, event){$root.showChangeNameDialog(maxsalary,data,event)}]]">
+                    <oj-bind-text value="[[maxsalary]]"></oj-bind-text>
+                  </div>
+                </td>
+                 <td>
+                  <div id="deptName" on-click="[[function(data, event){$root.showChangeNameDialog(minsalary,data,event)}]]">
+                    <oj-bind-text value="[[minsalary]]"></oj-bind-text>
+                  </div>
+                </td>
+              </tr>
+        </script>
+   
+          
+
+    </div>
   
 </div>
